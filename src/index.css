@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { cursor: none !important; }
+
+:root {
+  --cream: #f5f2ed;
+  --ink: #1a1814;
+  --ink-soft: #4a453e;
+  --ink-muted: #9a9189;
+  --accent: #c8a96e;
+  --accent-soft: rgba(200, 169, 110, 0.1);
+  --line: #e2ddd6;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--accent); }
+
+#cursor {
+  width: 8px; height: 8px;
+  background: var(--ink);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s ease, background 0.2s ease, width 0.2s, height 0.2s;
+}
+#cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  opacity: 0.3;
+  transition: all 0.06s linear;
+}
+#cursor.hovering { width: 14px; height: 14px; background: var(--accent); }
+#cursor-ring.hovering { width: 44px; height: 44px; border-color: var(--accent); opacity: 0.2; }
+
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--ink-soft);
+  transition: all 0.2s;
+  display: inline-block;
+}
+.tag:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+.link-line {
+  position: relative;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.link-line::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0;
+  width: 0; height: 1px;
+  background: var(--accent);
+  transition: width 0.28s cubic-bezier(.25,.46,.45,.94);
+}
+.link-line:hover::after { width: 100%; }
+.link-line:hover { color: var(--ink); }
