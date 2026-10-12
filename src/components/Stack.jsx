@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { Reveal, SectionHeader } from "./ui";
+import { sectionPad } from "./tokens";
 import { SiPython, SiTypescript, SiJavascript, SiGo, SiExpress, SiNestjs, SiNextdotjs, SiReact, SiFastapi, SiPostgresql, SiMysql, SiRedis, SiMongodb, SiDocker, SiLinux, SiGraphql } from "react-icons/si";
 import { FaJava } from "react-icons/fa";
 
@@ -45,79 +45,48 @@ const categories = [
   },
 ];
 
-function CategoryBlock({ cat, index }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
+function CategoryCard({ cat, index }) {
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="py-8"
-      style={{ borderBottom: "1px solid var(--line)" }}
+    <Reveal
+      delay={index * 0.08}
+      className="p-7 md:p-8 border transition-colors duration-300 hover:border-[var(--accent)]"
+      style={{ background: "var(--cream-deep)", borderColor: "var(--line)" }}
     >
-      <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-16">
-        <span
-          className="font-mono text-xs tracking-widest uppercase w-28 flex-shrink-0 pt-0.5"
-          style={{ color: "var(--ink-muted)" }}
-        >
+      <div className="flex items-baseline justify-between mb-6">
+        <span className="font-mono text-xs tracking-widest uppercase" style={{ color: "var(--ink-muted)" }}>
           {cat.label}
         </span>
-        <div className="flex flex-wrap gap-2">
-          {cat.items.map((item) => {
-            const Icon = item.icon;
-            return (
-              <span key={item.name} className="tag" data-hover style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-                {Icon && <Icon size={12} style={{ color: item.color, flexShrink: 0 }} />}
-                {item.name}
-              </span>
-            );
-          })}
-        </div>
+        <span className="font-mono text-xs" style={{ color: "var(--accent)" }}>
+          {String(cat.items.length).padStart(2, "0")}
+        </span>
       </div>
-    </motion.div>
+      <div className="flex flex-wrap gap-2">
+        {cat.items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <span
+              key={item.name}
+              className="tag"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "var(--cream)", padding: "0.35rem 0.7rem" }}
+            >
+              {Icon && <Icon size={13} style={{ color: item.color, flexShrink: 0 }} />}
+              {item.name}
+            </span>
+          );
+        })}
+      </div>
+    </Reveal>
   );
 }
 
 export default function Stack() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section id="stack" className="px-8 md:px-16 lg:px-24 py-32">
-      <div className="max-w-4xl">
-        {/* section header */}
-        <div className="flex items-center gap-8 mb-16">
-          <motion.span
-            ref={ref}
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6 }}
-            className="font-mono text-xs tracking-widest"
-            style={{ color: "var(--ink-muted)" }}
-          >
-            02 — STACK
-          </motion.span>
-          <div className="flex-1 h-px" style={{ background: "var(--line)" }} />
-        </div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl md:text-5xl font-light tracking-tight mb-16"
-          style={{ color: "var(--ink)" }}
-        >
-          Tools I work with
-        </motion.h2>
-
-        <div style={{ borderTop: "1px solid var(--line)" }}>
-          {categories.map((cat, i) => (
-            <CategoryBlock key={cat.label} cat={cat} index={i} />
-          ))}
-        </div>
+    <section id="stack" className={`${sectionPad} py-24 md:py-28`}>
+      <SectionHeader index="02" label="Stack" title="Tools I work with" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {categories.map((cat, i) => (
+          <CategoryCard key={cat.label} cat={cat} index={i} />
+        ))}
       </div>
     </section>
   );

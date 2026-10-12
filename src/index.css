@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* { cursor: none !important; }
-
 :root {
   --cream: #f5f2ed;
+  --cream-deep: #ece7df;
   --ink: #1a1814;
   --ink-soft: #4a453e;
   --ink-muted: #9a9189;
   --accent: #c8a96e;
   --accent-soft: rgba(200, 169, 110, 0.1);
   --line: #e2ddd6;
+  --line-dark: rgba(245, 242, 237, 0.14);
+  --ease: cubic-bezier(.25,.46,.45,.94);
 }
 
 html { scroll-behavior: smooth; }
@@ -25,33 +25,42 @@ body {
   overflow-x: hidden;
 }
 
+::selection { background: var(--accent); color: var(--ink); }
+
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--cream); }
 ::-webkit-scrollbar-thumb { background: var(--accent); }
 
-#cursor {
-  width: 8px; height: 8px;
-  background: var(--ink);
-  border-radius: 50%;
-  position: fixed; top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.12s ease, background 0.2s ease, width 0.2s, height 0.2s;
+/* custom cursor — mouse/trackpad only, so touch devices keep native behaviour */
+#cursor, #cursor-ring { display: none; }
+
+@media (pointer: fine) {
+  * { cursor: none !important; }
+
+  #cursor, #cursor-ring {
+    display: block;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference; /* stays visible on cream and on dark photos */
+  }
+  #cursor {
+    width: 8px; height: 8px;
+    background: #fff;
+    z-index: 9999;
+    transition: width 0.2s, height 0.2s;
+  }
+  #cursor-ring {
+    width: 32px; height: 32px;
+    border: 1px solid #fff;
+    z-index: 9998;
+    opacity: 0.35;
+    transition: width 0.2s, height 0.2s, opacity 0.2s;
+  }
+  #cursor.hovering { width: 14px; height: 14px; }
+  #cursor-ring.hovering { width: 48px; height: 48px; opacity: 0.6; }
 }
-#cursor-ring {
-  width: 32px; height: 32px;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  position: fixed; top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  opacity: 0.3;
-  transition: all 0.06s linear;
-}
-#cursor.hovering { width: 14px; height: 14px; background: var(--accent); }
-#cursor-ring.hovering { width: 44px; height: 44px; border-color: var(--accent); opacity: 0.2; }
 
 .tag {
   font-family: 'DM Mono', monospace;
@@ -77,7 +86,26 @@ body {
   bottom: -1px; left: 0;
   width: 0; height: 1px;
   background: var(--accent);
-  transition: width 0.28s cubic-bezier(.25,.46,.45,.94);
+  transition: width 0.28s var(--ease);
 }
 .link-line:hover::after { width: 100%; }
 .link-line:hover { color: var(--ink); }
+
+/* hero photo slowly settles in — pure CSS so it starts before JS hydrates */
+@keyframes settle {
+  from { transform: scale(1.08); }
+  to { transform: scale(1); }
+}
+.hero-photo { animation: settle 2.4s var(--ease) both; }
+
+/* infinite stack ticker */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 32s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-photo, .marquee-track { animation: none; }
+}

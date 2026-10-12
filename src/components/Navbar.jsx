@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { ease } from "./tokens";
 
 const links = [
   { label: "about", href: "#about" },
@@ -9,44 +10,71 @@ const links = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const [solid, setSolid] = useState(false);
+  const [active, setActive] = useState("");
 
+  // turn solid once the dark hero banner has scrolled away
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setSolid(window.scrollY > window.innerHeight - 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // highlight the section currently in the middle of the viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    links.forEach((l) => {
+      const el = document.querySelector(l.href);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const fg = solid ? "var(--ink)" : "var(--cream)";
 
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center"
+      transition={{ duration: 0.6, ease }}
+      className="fixed top-0 left-0 right-0 z-50 px-6 md:px-16 lg:px-24 py-5 flex justify-between items-center"
       style={{
-        borderBottom: scrolled ? "1px solid var(--line)" : "1px solid transparent",
-        background: scrolled ? "rgba(245,242,237,0.88)" : "transparent",
-        backdropFilter: scrolled ? "blur(12px)" : "none",
-        transition: "all 0.4s ease",
+        borderBottom: solid ? "1px solid var(--line)" : "1px solid transparent",
+        background: solid ? "rgba(245,242,237,0.88)" : "transparent",
+        backdropFilter: solid ? "blur(12px)" : "none",
+        WebkitBackdropFilter: solid ? "blur(12px)" : "none",
+        transition: "background 0.4s ease, border-color 0.4s ease",
       }}
     >
-      <a href="#" className="font-mono text-xs tracking-widest" style={{ color: "var(--ink-muted)" }}>
-        NATTAPHAN.PORTFOLIO
+      <a href="#top" className="font-mono text-sm tracking-[0.3em] transition-colors duration-300" style={{ color: fg }}>
+        N|P|T
       </a>
 
-      <nav className="flex items-center gap-8">
-        {links.map((l, i) => (
-          <motion.a
-            key={l.label}
-            href={l.href}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 * i + 0.3, duration: 0.4 }}
-            className="link-line font-mono text-xs tracking-wider"
-          >
-            {l.label}
-          </motion.a>
-        ))}
+      <nav className="flex items-center gap-5 md:gap-8">
+        {links.map((l) => {
+          const isActive = active === l.href.slice(1);
+          return (
+            <a
+              key={l.label}
+              href={l.href}
+              className="relative font-mono text-[0.68rem] md:text-xs tracking-wider transition-colors duration-300"
+              style={{ color: isActive ? "var(--accent)" : fg, opacity: isActive ? 1 : 0.75 }}
+            >
+              {l.label}
+              {isActive && (
+                <motion.span
+                  layoutId="nav-dot"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                  style={{ background: "var(--accent)" }}
+                />
+              )}
+            </a>
+          );
+        })}
       </nav>
     </motion.header>
   );

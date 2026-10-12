@@ -1,97 +1,115 @@
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Mail, ExternalLink, GitFork } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Check, Copy, GitFork, ExternalLink } from "lucide-react";
+import { Reveal, SectionHeader } from "./ui";
+import { sectionPad } from "./tokens";
+
+const email = "natthaphan0074@gmail.com";
 
 const socials = [
-  { icon: GitFork, label: "GitHub", href: "https://github.com/tik-04", handle: "@GitHub - tik-04" },
-  { icon: ExternalLink, label: "LinkedIn", href: "https://linkedin.com/in/", handle: "Linkedin - Nattaphan Pumipak" },
-  { icon: Mail, label: "Email", href: "natthaphan0074@gmail.com", handle: "natthaphan0074@gmail.com" },
+  { icon: GitFork, label: "GitHub", href: "https://github.com/tik-04", handle: "tik-04" },
+  { icon: ExternalLink, label: "LinkedIn", href: "https://linkedin.com/in/", handle: "Nattaphan Pumipak" },
 ];
 
-export default function Contact() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
+function CopyEmail() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // clipboard blocked (http / old browser) — the mailto link still works
+    }
+  };
   return (
-    <section id="contact" className="px-8 md:px-16 lg:px-24 py-32">
-      <div className="max-w-4xl">
-        <div className="flex items-center gap-8 mb-16">
-          <motion.span
-            ref={ref}
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6 }}
-            className="font-mono text-xs tracking-widest"
-            style={{ color: "var(--ink-muted)" }}
-          >
-            04 — CONTACT
-          </motion.span>
-          <div className="flex-1 h-px" style={{ background: "var(--line)" }} />
-        </div>
+    <button
+      onClick={copy}
+      className="inline-flex items-center gap-2 font-mono text-xs tracking-wider px-3 py-2 border transition-colors duration-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+      style={{ color: "rgba(245,242,237,0.7)", borderColor: "var(--line-dark)" }}
+    >
+      {copied ? <Check size={13} /> : <Copy size={13} />}
+      {copied ? "Copied" : "Copy email"}
+    </button>
+  );
+}
 
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-4xl md:text-6xl font-light tracking-tight leading-tight mb-8"
-          style={{ color: "var(--ink)" }}
+export default function Contact() {
+  return (
+    <section
+      id="contact"
+      className={`${sectionPad} pt-24 md:pt-28 pb-10`}
+      style={{ background: "var(--ink)", color: "var(--cream)" }}
+    >
+      <SectionHeader index="04" label="Contact" dark />
+
+      <Reveal
+        as="h2"
+        className="text-5xl sm:text-6xl md:text-8xl font-light tracking-tight leading-[1] mb-10"
+        style={{ color: "var(--cream)" }}
+      >
+        Let's build
+        <br />
+        something<span style={{ color: "var(--accent)" }}>.</span>
+      </Reveal>
+
+      <Reveal
+        as="p"
+        delay={0.1}
+        className="text-base font-light max-w-md leading-relaxed mb-14"
+        style={{ color: "rgba(245,242,237,0.65)" }}
+      >
+        Open to backend intern roles, API work, or just a good conversation about distributed
+        systems. Reach out any time.
+      </Reveal>
+
+      <Reveal delay={0.15} className="flex flex-col items-start sm:flex-row sm:items-center gap-5 mb-20">
+        <a
+          href={`mailto:${email}`}
+          className="group inline-flex items-center gap-3 text-xl sm:text-2xl md:text-3xl font-light break-all"
+          style={{ color: "var(--cream)" }}
         >
-          Let's build
-          <br />
-          something.
-        </motion.h2>
+          <span className="border-b pb-1 transition-colors duration-300 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]" style={{ borderColor: "var(--line-dark)" }}>
+            {email}
+          </span>
+          <ArrowUpRight size={24} className="shrink-0 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
+        </a>
+        <CopyEmail />
+      </Reveal>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-base font-light max-w-md leading-relaxed mb-16"
-          style={{ color: "var(--ink-soft)" }}
-        >
-          Open to Intern backend roles, API work, or just a good conversation
-          about distributed systems. Reach out any time.
-        </motion.p>
-
-        <div style={{ borderTop: "1px solid var(--line)" }}>
-          {socials.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <motion.a
-                key={s.label}
+      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ borderTop: "1px solid var(--line-dark)" }}>
+        {socials.map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <Reveal key={s.label} delay={0.2 + i * 0.08}>
+              <a
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                initial={{ opacity: 0, x: -12 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
-                className="flex items-center justify-between py-6 group"
-                style={{ borderBottom: "1px solid var(--line)" }}
-                data-hover
+                className={`group flex items-center justify-between py-6 ${i ? "sm:px-6 sm:border-l" : "sm:pr-6"}`}
+                style={{ borderBottom: "1px solid var(--line-dark)", borderLeftColor: "var(--line-dark)" }}
               >
-                <div className="flex items-center gap-4">
-                  <Icon size={15} style={{ color: "var(--ink-muted)" }} />
-                  <span className="text-sm font-mono tracking-wide" style={{ color: "var(--ink-soft)" }}>
-                    {s.handle}
+                <span className="flex items-center gap-4">
+                  <Icon size={16} style={{ color: "var(--accent)" }} />
+                  <span className="font-mono text-xs uppercase tracking-widest" style={{ color: "rgba(245,242,237,0.5)" }}>
+                    {s.label}
                   </span>
-                </div>
-                <span className="font-mono text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ color: "var(--accent)" }}>
-                  {s.label} ↗
+                  <span className="text-sm" style={{ color: "var(--cream)" }}>{s.handle}</span>
                 </span>
-              </motion.a>
-            );
-          })}
-        </div>
+                <ArrowUpRight
+                  size={16}
+                  className="transition-all duration-300 opacity-40 group-hover:opacity-100 group-hover:text-[var(--accent)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </a>
+            </Reveal>
+          );
+        })}
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="mt-24 flex items-center justify-between max-w-4xl"
-      >
-        <span className="font-mono text-xs" style={{ color: "var(--ink-muted)" }}>© {new Date().getFullYear()} Nattaphan Pumipak </span>
-        <span className="font-mono text-xs" style={{ color: "var(--ink-muted)" }}>Built with React + Vite</span>
-      </motion.div>
+      <footer className="mt-24 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between font-mono text-xs" style={{ color: "rgba(245,242,237,0.4)" }}>
+        <span>© {new Date().getFullYear()} Nattaphan Pumipak</span>
+        <span className="tracking-[0.3em]" style={{ color: "rgba(245,242,237,0.7)" }}>N|P|T</span>
+        <a href="#top" className="hover:text-[var(--cream)] transition-colors">Back to top ↑</a>
+      </footer>
     </section>
   );
 }

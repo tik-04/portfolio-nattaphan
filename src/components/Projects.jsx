@@ -1,32 +1,33 @@
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
 import { ArrowUpRight, GitFork } from "lucide-react";
-import { 
-  SiTypescript, 
-  SiExpress, 
-  SiNestjs, 
-  SiPostgresql, 
-  SiMysql, 
-  SiRedis, 
-  SiDocker, 
-  SiLinux, 
-  SiNginx, 
-  SiHtml5, 
+import {
+  SiTypescript,
+  SiExpress,
+  SiNestjs,
+  SiPostgresql,
+  SiMysql,
+  SiRedis,
+  SiDocker,
+  SiNginx,
+  SiHtml5,
   SiCss,
   SiJavascript,
-  SiNodedotjs
+  SiNodedotjs,
 } from "react-icons/si";
+import { Reveal, SectionHeader } from "./ui";
+import { sectionPad } from "./tokens";
+import mentoring from "../assets/me/web/mentoring.webp";
+import whiteboard from "../assets/me/web/whiteboard.webp";
+import pairing from "../assets/me/web/pairing.webp";
 
 const projects = [
   {
     num: "01",
-    title: "INTREGRATED PROJECT",
+    kind: "Full-stack web app",
+    title: "Integrated Project",
     desc: [
-      `- Developed a full-stack web application for students to register and select academic tracks using 
-            Express.js, Prisma ORM, and MySQL.`,
-      `- Containerized the entire application using Docker, facilitating consistent development and production environments.`,
-      `- Configured and deployed the application on a Linux server using Nginx as a reverse proxy to
-            enhance security and performance.`,
+      "Developed a full-stack web application for students to register and select academic tracks using Express.js, Prisma ORM, and MySQL.",
+      "Containerized the entire application using Docker, facilitating consistent development and production environments.",
+      "Configured and deployed the application on a Linux server using Nginx as a reverse proxy to enhance security and performance.",
     ],
     stack: [
       { name: "HTML5", icon: SiHtml5, color: "#E34F26" },
@@ -42,13 +43,18 @@ const projects = [
   },
   {
     num: "02",
-    title: "ENTERPRISE NOTIFICATION GATEWAY",
+    kind: "Microservice",
+    title: "Enterprise Notification Gateway",
+    metrics: [
+      { value: "741", label: "req/s" },
+      { value: "73ms", label: "p95 latency" },
+      { value: "200", label: "concurrent users" },
+    ],
     desc: [
-              `- Built event-driven notification microservice supporting Email/SMS with retry,
-              Dead Letter Queue, and Redis-based idempotency to prevent duplicate sends.`,
-              `- Achieved 741 req/s throughput at p95 latency 73ms under 200 concurrent users.`,
-              `- Monitored real-time queue depth and delivery rate via Prometheus + Grafana dashboard.`,
-          ],
+      "Built event-driven notification microservice supporting Email/SMS with retry, Dead Letter Queue, and Redis-based idempotency to prevent duplicate sends.",
+      "Achieved 741 req/s throughput at p95 latency 73ms under 200 concurrent users.",
+      "Monitored real-time queue depth and delivery rate via Prometheus + Grafana dashboard.",
+    ],
     stack: [
       { name: "NestJS", icon: SiNestjs, color: "#E0234E" },
       { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
@@ -60,15 +66,18 @@ const projects = [
   },
   {
     num: "03",
-    title: "IT KMUTT Hello world camp | Backend Mentor",
+    kind: "Backend Mentor",
+    title: "IT KMUTT Hello World Camp",
     desc: [
-              `- Led and mentored 30+ freshman students on backend development fundamentals, focusing on
-                  Node.js and Express.js.`,
-              `- Designed a comprehensive curriculum covering RESTful API design, middleware implementation,
-                  and professional App Structure (MVC/Layered Architecture).`,
-              `- Guided students through hands-on workshops to build their first functional API, emphasizing
-                  clean code and industry best practices.`,
-          ],
+      "Led and mentored 30+ freshman students on backend development fundamentals, focusing on Node.js and Express.js.",
+      "Designed a comprehensive curriculum covering RESTful API design, middleware implementation, and professional App Structure (MVC/Layered Architecture).",
+      "Guided students through hands-on workshops to build their first functional API, emphasizing clean code and industry best practices.",
+    ],
+    photos: [
+      { src: whiteboard, alt: "Explaining route, controller and service layers on a whiteboard" },
+      { src: mentoring, alt: "Mentoring students as they debug their code" },
+      { src: pairing, alt: "Pairing with a student on their first API" },
+    ],
     stack: [
       { name: "NodeJS", icon: SiNodedotjs, color: "#339933" },
       { name: "Express", icon: SiExpress, color: "#000000" },
@@ -79,116 +88,124 @@ const projects = [
   },
 ];
 
-function ProjectCard({ project, index }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+// "#" is a placeholder — don't render a link that goes nowhere
+const isReal = (href) => href && href !== "#";
 
+function ProjectRow({ project }) {
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="group py-10"
-      style={{ borderBottom: "1px solid var(--line)" }}
-      data-hover
-    >
-      <div className="flex items-start justify-between gap-8">
-        <div className="flex-1">
-          <div className="flex items-center gap-4 mb-3">
-            <span className="font-mono text-xs" style={{ color: "var(--ink-muted)" }}>
-              {project.num}
+    <Reveal className="group py-12 md:py-16" style={{ borderBottom: "1px solid var(--line)" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+        {/* left: identity */}
+        <div className="lg:col-span-5">
+          <div className="flex items-center gap-3 mb-4 font-mono text-xs">
+            <span style={{ color: "var(--accent)" }}>{project.num}</span>
+            <span className="inline-block w-6 h-px" style={{ background: "var(--line)" }} />
+            <span className="uppercase tracking-widest" style={{ color: "var(--ink-muted)" }}>
+              {project.kind}
             </span>
-            <h3 className="text-xl font-medium tracking-tight" style={{ color: "var(--ink)" }}>
-              {project.title}
-            </h3>
           </div>
-          <p className="text-sm leading-relaxed max-w-lg mb-5 font-light" style={{ color: "var(--ink-soft)" }}>
-            <div className="tag">
-              {project.desc.map((s) => (
-              <>
-                <span key={s}>{s}</span>
-                <br />
-              </>
-            ))}
+          <h3
+            className="text-3xl md:text-4xl font-light tracking-tight leading-tight mb-6 transition-colors duration-300 group-hover:text-[var(--ink-soft)]"
+            style={{ color: "var(--ink)" }}
+          >
+            {project.title}
+          </h3>
+
+          <div className="flex items-center gap-5">
+            {isReal(project.github) && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-line inline-flex items-center gap-2 font-mono text-xs tracking-wider"
+              >
+                <GitFork size={14} /> Source
+              </a>
+            )}
+            {isReal(project.live) && (
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-line inline-flex items-center gap-2 font-mono text-xs tracking-wider"
+              >
+                <ArrowUpRight size={14} /> Live
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* right: details */}
+        <div className="lg:col-span-7">
+          {project.metrics && (
+            <div className="grid grid-cols-3 mb-8 border" style={{ borderColor: "var(--line)" }}>
+              {project.metrics.map((m, i) => (
+                <div
+                  key={m.label}
+                  className="px-4 py-4"
+                  style={{ borderLeft: i ? "1px solid var(--line)" : "none", background: "var(--cream-deep)" }}
+                >
+                  <div className="text-2xl md:text-3xl font-light tracking-tight" style={{ color: "var(--ink)" }}>
+                    {m.value}
+                  </div>
+                  <div className="font-mono text-[0.65rem] uppercase tracking-wider mt-1" style={{ color: "var(--ink-muted)" }}>
+                    {m.label}
+                  </div>
+                </div>
+              ))}
             </div>
-          </p>
+          )}
+
+          {project.photos && (
+            <div className="grid grid-cols-3 gap-2 mb-8">
+              {project.photos.map((p) => (
+                <div key={p.src} className="aspect-[4/3] overflow-hidden" style={{ background: "var(--line)" }}>
+                  <img
+                    src={p.src}
+                    alt={p.alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 hover:scale-105 transition-all duration-700"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <ul className="space-y-3 mb-8">
+            {project.desc.map((line) => (
+              <li key={line} className="flex gap-4 text-sm md:text-[0.95rem] font-light leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                <span className="mt-[0.6em] w-3 h-px shrink-0" style={{ background: "var(--accent)" }} />
+                {line}
+              </li>
+            ))}
+          </ul>
+
           <div className="flex flex-wrap gap-1.5">
             {project.stack.map((item) => {
               const Icon = item.icon;
               return (
-                <span 
-                  key={item.name} 
-                  className="tag" 
-                  data-hover 
-                  style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "4px 8px", borderRadius: "4px" }}
-                >
-                  {Icon && <Icon size={14} style={{ color: item.color, flexShrink: 0 }} />}
-                  <span className="text-[11px] font-medium uppercase tracking-wider">{item.name}</span>
+                <span key={item.name} className="tag" style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+                  {Icon && <Icon size={12} style={{ color: item.color, flexShrink: 0 }} />}
+                  {item.name}
                 </span>
               );
             })}
           </div>
         </div>
-        <div className="flex items-center gap-3 pt-1 flex-shrink-0">
-          <a href={project.github} target="blank"
-              className="p-2 transition-all duration-200" style={{ color: "var(--ink-muted)" }} data-hover aria-label="GitHub">
-            <GitFork size={16} />
-          </a>
-          {project.live && (
-            <a href={project.live} className="p-2 transition-all duration-200" style={{ color: "var(--ink-muted)" }} data-hover aria-label="Live demo">
-              <ArrowUpRight size={16} />
-            </a>
-          )}
-        </div>
       </div>
-    </motion.div>
+    </Reveal>
   );
 }
 
 export default function Projects() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section id="projects" className="px-8 md:px-16 lg:px-24 py-32">
-      <div className="max-w-4xl">
-        <div className="flex items-center gap-8 mb-16">
-          <motion.span
-            ref={ref}
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6 }}
-            className="font-mono text-xs tracking-widest"
-            style={{ color: "var(--ink-muted)" }}
-          >
-            03 — PROJECTS
-          </motion.span>
-          <div className="flex-1 h-px" style={{ background: "var(--line)" }} />
-        </div>
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl md:text-5xl font-light tracking-tight mb-4"
-          style={{ color: "var(--ink)" }}
-        >
-          My Work
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-sm font-light mb-16"
-          style={{ color: "var(--ink-muted)" }}
-        >
-          Backend-focused projects — replace with your real work.
-        </motion.p>
-        <div style={{ borderTop: "1px solid var(--line)"}}>
-          {projects.map((p, i) => (
-            <ProjectCard key={p.num} project={p} index={i} />
-          ))}
-        </div>
+    <section id="projects" className={`${sectionPad} py-24 md:py-28`} style={{ background: "var(--cream)" }}>
+      <SectionHeader index="03" label="Projects" title="Selected work" />
+      <div style={{ borderTop: "1px solid var(--line)" }}>
+        {projects.map((p) => (
+          <ProjectRow key={p.num} project={p} />
+        ))}
       </div>
     </section>
   );

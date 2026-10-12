@@ -1,50 +1,56 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+const HOVERABLE = "a, button, [data-hover]";
 
 export default function Cursor() {
+  const dotRef = useRef(null);
+  const ringRef = useRef(null);
+
   useEffect(() => {
-    const cursor = document.getElementById("cursor");
-    const ring = document.getElementById("cursor-ring");
-    let ringX = 0, ringY = 0;
-    let curX = 0, curY = 0;
+    // touch screens get the native behaviour (CSS hides the elements too)
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    let ringX = 0, ringY = 0, curX = 0, curY = 0, frame;
 
     const onMove = (e) => {
       curX = e.clientX;
       curY = e.clientY;
-      cursor.style.left = curX + "px";
-      cursor.style.top = curY + "px";
+      dot.style.left = curX + "px";
+      dot.style.top = curY + "px";
+    };
+
+    // delegated, so links rendered after mount are picked up too
+    const onOver = (e) => {
+      const hovering = !!e.target.closest?.(HOVERABLE);
+      dot.classList.toggle("hovering", hovering);
+      ring.classList.toggle("hovering", hovering);
     };
 
     const animate = () => {
-      ringX += (curX - ringX) * 0.12;
-      ringY += (curY - ringY) * 0.12;
+      ringX += (curX - ringX) * 0.15;
+      ringY += (curY - ringY) * 0.15;
       ring.style.left = ringX + "px";
       ring.style.top = ringY + "px";
-      requestAnimationFrame(animate);
+      frame = requestAnimationFrame(animate);
     };
 
-    const onEnter = () => {
-      cursor.classList.add("hovering");
-      ring.classList.add("hovering");
-    };
-    const onLeave = () => {
-      cursor.classList.remove("hovering");
-      ring.classList.remove("hovering");
-    };
-
-    window.addEventListener("mousemove", onMove);
-    document.querySelectorAll("a, button, [data-hover]").forEach((el) => {
-      el.addEventListener("mouseenter", onEnter);
-      el.addEventListener("mouseleave", onLeave);
-    });
-
+    window.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("mouseover", onOver);
     animate();
-    return () => window.removeEventListener("mousemove", onMove);
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseover", onOver);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   return (
     <>
-      <div id="cursor" />
-      <div id="cursor-ring" />
+      <div id="cursor" ref={dotRef} />
+      <div id="cursor-ring" ref={ringRef} />
     </>
   );
 }
